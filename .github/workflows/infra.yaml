@@ -23,20 +23,20 @@ permissions:
       contents: read
  
 jobs:
-  AssumeRoleAndCallIdentity:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v3
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1.7.0
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: GitHub_to_AWS_via_FederatedOIDC
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Sts GetCallerIdentity
-        run: |
-          aws sts get-caller-identity
+#   AssumeRoleAndCallIdentity:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Git clone the repository
+#         uses: actions/checkout@v3
+#       - name: configure aws credentials
+#         uses: aws-actions/configure-aws-credentials@v1.7.0
+#         with:
+#           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+#           role-session-name: GitHub_to_AWS_via_FederatedOIDC
+#           aws-region: ${{ env.AWS_REGION }}
+#       - name: Sts GetCallerIdentity
+#         run: |
+#           aws sts get-caller-identity
   terraform:
     name: 'Terraform Workflow'
     runs-on: ubuntu-latest
@@ -50,10 +50,10 @@ jobs:
       with:
         terraform_version: 1.0.0
 
-    - name: 'Change Directory to 01.vpc'
-      run: cd 01.vpc
-    - name: 'listing the files in the dir'
-      run: ls -l
+    - name: 'Current Working Dir'
+      run: pwd
+    # - name: 'listing the files in the dir'
+    #   run: ls -l
 
     # - name: 'Terraform Init'
     #   run: terraform init -upgrade
