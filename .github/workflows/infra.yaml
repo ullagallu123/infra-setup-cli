@@ -51,7 +51,7 @@ jobs:
         terraform_version: 1.0.0
 
     - name: 'Change Directory to 01.vpc'
-      run: cd expense/01.vpc
+      run: cd 01.vpc
 
     - name: 'Terraform Init'
       run: terraform init -upgrade
