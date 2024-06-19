@@ -49,14 +49,11 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.0.0
+    - name: 'cd to 01.vpc'
+      run: cd 01.vpc
 
-    - name: 'Current Working Dir'
-      run: pwd
-
-    - name: 'Listing curret dir files'
+    - name: 'listing content in the folder'
       run: ls -l
-    # - name: 'listing the files in the dir'
-    #   run: ls -l
 
     # - name: 'Terraform Init'
     #   run: terraform init -upgrade
