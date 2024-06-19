@@ -23,20 +23,20 @@ permissions:
       contents: read
  
 jobs:
-#   AssumeRoleAndCallIdentity:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Git clone the repository
-#         uses: actions/checkout@v3
-#       - name: configure aws credentials
-#         uses: aws-actions/configure-aws-credentials@v1.7.0
-#         with:
-#           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-#           role-session-name: GitHub_to_AWS_via_FederatedOIDC
-#           aws-region: ${{ env.AWS_REGION }}
-#       - name: Sts GetCallerIdentity
-#         run: |
-#           aws sts get-caller-identity
+  AssumeRoleAndCallIdentity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
   terraform:
     name: 'Terraform Workflow'
     runs-on: ubuntu-latest
@@ -49,33 +49,28 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.0.0
-    
-    - name: Print Current Directory
-      run: pwd
-
     - name: Change Directory to 01.vpc and Run Terraform Commands
       run: |
         cd 01.vpc &&
-        pwd &&
-        ls -l  # List files to verify Terraform configuration files exist
+        
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-   
+    - name: Initializing
+      run: terraform init -upgrade
+
+    - name: Format Check
+      run: terraform fmt -check
+
+    - name: Validate Configuration
+      run: terraform validate
+
+    - name: Plan Changes
+      run: terraform plan
+
+    - name: Apply or Destroy Changes
+      run: terraform ${{ github.event.inputs.action }} -auto-approve
+
 
     
-
-    # - name: 'Terraform Init'
-    #   run: terraform init -upgrade
-
-    # - name: 'Terraform Format'
-    #   run: terraform fmt -check
-
-    # - name: 'Terraform Validate'
-    #   run: terraform validate
-
-    # - name: 'Terraform Plan'
-    #   run: terraform plan
-
-    # - name: 'Terraform Apply or Destroy'
-    #   run: terraform ${{ github.event.inputs.action }} -auto-approve
-      
 
