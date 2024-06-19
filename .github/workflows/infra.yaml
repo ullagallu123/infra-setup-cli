@@ -52,6 +52,9 @@ jobs:
 
     - name: 'Current Working Dir'
       run: pwd
+
+    - name: 'Listing curret dir files'
+      run: ls -l
     # - name: 'listing the files in the dir'
     #   run: ls -l
 
