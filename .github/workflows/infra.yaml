@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      TF_VERSION: '1.8.5' # Change this to your required Terraform version
+      TF_VERSION: '1.8.5' 
       TF_WORKING_DIR: '01.vpc'
 
     steps:
@@ -66,23 +66,30 @@ jobs:
       run: ls -l
       working-directory: ${{ env.TF_WORKING_DIR }}
 
-    # - name: Checkout Repository
-    #   uses: actions/checkout@v2
+    - name: Initializing
+      run: terraform init -upgrade
+      working-directory: ${{ env.TF_WORKING_DIR }}
 
-    # - name: Initializing
-    #   run: terraform init -upgrade
 
-    # - name: Format Check
-    #   run: terraform fmt -check
+    - name: Format Check
+      run: terraform fmt -check
+      working-directory: ${{ env.TF_WORKING_DIR }}
 
-    # - name: Validate Configuration
-    #   run: terraform validate
 
-    # - name: Plan Changes
-    #   run: terraform plan
+    - name: Validate Configuration
+      run: terraform validate
+      working-directory: ${{ env.TF_WORKING_DIR }}
 
-    # - name: Apply or Destroy Changes
-    #   run: terraform ${{ github.event.inputs.action }} -auto-approve
+
+    - name: Plan Changes
+      run: terraform plan
+      working-directory: ${{ env.TF_WORKING_DIR }}
+
+
+    - name: Apply or Destroy Changes
+      run: terraform ${{ github.event.inputs.action }} -auto-approve
+      working-directory: ${{ env.TF_WORKING_DIR }}
+
 
 
     
