@@ -17,6 +17,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
+  TF_VERSION: '1.8.5'
+  TF_WORKING_DIR: '01.vpc'
 
 permissions:
   id-token: write
@@ -26,10 +28,6 @@ jobs:
   terraform:
     name: Terraform Workflow
     runs-on: ubuntu-latest
-
-    env:
-      TF_VERSION: '1.8.5'
-      TF_WORKING_DIR: '01.vpc'
 
     steps:
       - name: Configure AWS credentials from Test account
@@ -50,17 +48,6 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      # - name: Terraform Version
-      #   run: terraform -version
-
-      # - name: Current Working Directory
-      #   run: pwd
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      
-      # - name: Listing the Content
-      #   run: ls -l
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-
       - name: Initializing
         run: terraform init -upgrade
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -69,13 +56,34 @@ jobs:
         run: terraform plan -out=plan.tfplan
         working-directory: ${{ env.TF_WORKING_DIR }}
 
-      - name: Manual Approval
-        if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
-        run: |
-          echo "Workflow requires approval to proceed."
-          echo "Action: ${{ github.event.inputs.action }}"
-          echo "Review the Terraform plan and approve or reject."
-          # You can add additional logic here for approval steps, such as manual review or external approval systems.
+      - name: Upload Plan
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraform-plan
+          path: ${{ env.TF_WORKING_DIR }}/plan.tfplan
+
+  approval:
+    name: 'Approve Terraform Action'
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Plan
+        uses: actions/download-artifact@v2
+        with:
+          name: terraform-plan
+          path: plan.tfplan
+
+      - name: Wait for Approval
+        uses: peter-evans/wait-for-approval@v2
+        with:
+          custom-message: 'Please approve the Terraform action'
+          timeout-minutes: 5
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
 
       - name: Execute Terraform Action
         if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
@@ -87,6 +95,4 @@ jobs:
           else
             echo "Invalid action provided: ${{ github.event.inputs.action }}. Exiting."
             exit 1
-          fi
         working-directory: ${{ env.TF_WORKING_DIR }}
-
