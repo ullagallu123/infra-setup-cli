@@ -7,19 +7,19 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Choose Terraform action: apply or destroy'
+        description: 'Choose an action: apply or destroy'
         required: true
         default: 'apply'
         type: choice
         options:
           - apply
           - destroy
-    
+
 env:
   AWS_REGION: us-east-1
 
 permissions:
-  id-token: write   
+  id-token: write
   contents: read
 
 jobs:
@@ -61,28 +61,32 @@ jobs:
         run: ls -l
         working-directory: ${{ env.TF_WORKING_DIR }}
 
-      - name: Initializing
-        run: terraform init -upgrade
-        working-directory: ${{ env.TF_WORKING_DIR }}
+      # - name: Initializing
+      #   run: terraform init -upgrade
+      #   working-directory: ${{ env.TF_WORKING_DIR }}
 
-      - name: Format Check
-        run: terraform fmt -recursive
-        working-directory: ${{ env.TF_WORKING_DIR }}
+      # - name: Terraform Plan
+      #   run: terraform plan -out=plan.tfplan
+      #   working-directory: ${{ env.TF_WORKING_DIR }}
 
-      - name: Validate Configuration
-        run: terraform validate
-        working-directory: ${{ env.TF_WORKING_DIR }}
+      # - name: Manual Approval
+      #   if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
+      #   run: |
+      #     echo "Workflow requires approval to proceed."
+      #     echo "Action: ${{ github.event.inputs.action }}"
+      #     echo "Review the Terraform plan and approve or reject."
+      #     # You can add additional logic here for approval steps, such as manual review or external approval systems.
 
-      - name: Plan Changes
-        run: terraform plan
-        working-directory: ${{ env.TF_WORKING_DIR }}
+      # - name: Execute Terraform Action
+      #   if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
+      #   run: |
+      #     if [ "${{ github.event.inputs.action }}" == "apply" ]; then
+      #       terraform apply "plan.tfplan"
+      #     elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+      #       terraform destroy -auto-approve
+      #     else
+      #       echo "Invalid action provided: ${{ github.event.inputs.action }}. Exiting."
+      #       exit 1
+      #     fi
+      #   working-directory: ${{ env.TF_WORKING_DIR }}
 
-      - name: Apply Changes
-        if: github.event.inputs.action == 'apply'
-        run: terraform apply -auto-approve
-        working-directory: ${{ env.TF_WORKING_DIR }}
-
-      - name: Destroy Changes
-        if: github.event.inputs.action == 'destroy'
-        run: terraform destroy -auto-approve
-        working-directory: ${{ env.TF_WORKING_DIR }}
