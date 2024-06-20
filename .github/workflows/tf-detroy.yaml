@@ -1,0 +1,53 @@
+name: Terraform Workflow
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  TF_VERSION: '1.8.5'
+  TF_WORKING_DIR: '01.vpc'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy-vpc:
+    name: Terraform Workflow
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get Caller Identity
+        run: aws sts get-caller-identity
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Initializing
+        run: terraform init -upgrade
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Plan
+        run: terraform plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      
+   
+           
