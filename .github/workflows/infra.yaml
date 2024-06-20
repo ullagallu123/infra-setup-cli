@@ -74,7 +74,7 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Format Check
-        run: terraform fmt -check
+        run: terraform fmt -recursive
         working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Validate Configuration
