@@ -40,6 +40,10 @@ jobs:
   terraform:
     name: 'Terraform Workflow'
     runs-on: ubuntu-latest
+    
+    env:
+      TF_VERSION: '1.8.5' # Change this to your required Terraform version
+      TF_WORKING_DIR: '01.vpc'
 
     steps:
     - name: 'Checkout Repository'
@@ -48,28 +52,37 @@ jobs:
     - name: 'Set up Terraform'
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.0.0
-    - name: Change Directory to 01.vpc and Run Terraform Commands
-      run: |
-        cd 01.vpc 
-        
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+        terraform_version: ${{ env.TF_VERSION}}
 
-    - name: Initializing
-      run: terraform init -upgrade
+    
+    - name: 'Terraform version'
+      run: terraform -version
 
-    - name: Format Check
-      run: terraform fmt -check
+    - name: 'Current Working dir'
+      run: pwd
+      working-directory: ${{ env.TF_WORKING_DIR }}
 
-    - name: Validate Configuration
-      run: terraform validate
+    - name: 'Listing the content'
+      run: ls -l
+      working-directory: ${{ env.TF_WORKING_DIR }}
 
-    - name: Plan Changes
-      run: terraform plan
+    # - name: Checkout Repository
+    #   uses: actions/checkout@v2
 
-    - name: Apply or Destroy Changes
-      run: terraform ${{ github.event.inputs.action }} -auto-approve
+    # - name: Initializing
+    #   run: terraform init -upgrade
+
+    # - name: Format Check
+    #   run: terraform fmt -check
+
+    # - name: Validate Configuration
+    #   run: terraform validate
+
+    # - name: Plan Changes
+    #   run: terraform plan
+
+    # - name: Apply or Destroy Changes
+    #   run: terraform ${{ github.event.inputs.action }} -auto-approve
 
 
     
