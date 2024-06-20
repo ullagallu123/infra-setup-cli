@@ -10,7 +10,7 @@ terraform {
     bucket         = "expense-ugl-infra-terraform"
     key            = "expense/vpc/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "aws-infra-locking"
+    dynamodb_table = "terraform-state-locking"
   }
 }
 
