@@ -74,12 +74,6 @@ jobs:
           name: terraform-plan
           path: plan.tfplan
 
-      - name: Wait for Approval
-        uses: peter-evans/wait-for-approval@v2
-        with:
-          custom-message: 'Please approve the Terraform action'
-          timeout-minutes: 5
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
