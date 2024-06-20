@@ -50,43 +50,43 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Terraform Version
-        run: terraform -version
+      # - name: Terraform Version
+      #   run: terraform -version
 
-      - name: Current Working Directory
-        run: pwd
-        working-directory: ${{ env.TF_WORKING_DIR }}
+      # - name: Current Working Directory
+      #   run: pwd
+      #   working-directory: ${{ env.TF_WORKING_DIR }}
       
-      - name: Listing the Content
-        run: ls -l
+      # - name: Listing the Content
+      #   run: ls -l
+      #   working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Initializing
+        run: terraform init -upgrade
         working-directory: ${{ env.TF_WORKING_DIR }}
 
-      # - name: Initializing
-      #   run: terraform init -upgrade
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
+      - name: Terraform Plan
+        run: terraform plan -out=plan.tfplan
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
-      # - name: Terraform Plan
-      #   run: terraform plan -out=plan.tfplan
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
+      - name: Manual Approval
+        if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
+        run: |
+          echo "Workflow requires approval to proceed."
+          echo "Action: ${{ github.event.inputs.action }}"
+          echo "Review the Terraform plan and approve or reject."
+          # You can add additional logic here for approval steps, such as manual review or external approval systems.
 
-      # - name: Manual Approval
-      #   if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
-      #   run: |
-      #     echo "Workflow requires approval to proceed."
-      #     echo "Action: ${{ github.event.inputs.action }}"
-      #     echo "Review the Terraform plan and approve or reject."
-      #     # You can add additional logic here for approval steps, such as manual review or external approval systems.
-
-      # - name: Execute Terraform Action
-      #   if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
-      #   run: |
-      #     if [ "${{ github.event.inputs.action }}" == "apply" ]; then
-      #       terraform apply "plan.tfplan"
-      #     elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
-      #       terraform destroy -auto-approve
-      #     else
-      #       echo "Invalid action provided: ${{ github.event.inputs.action }}. Exiting."
-      #       exit 1
-      #     fi
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
+      - name: Execute Terraform Action
+        if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
+        run: |
+          if [ "${{ github.event.inputs.action }}" == "apply" ]; then
+            terraform apply "plan.tfplan"
+          elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            terraform destroy -auto-approve
+          else
+            echo "Invalid action provided: ${{ github.event.inputs.action }}. Exiting."
+            exit 1
+          fi
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
